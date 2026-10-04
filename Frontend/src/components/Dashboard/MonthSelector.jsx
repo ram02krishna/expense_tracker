@@ -14,10 +14,36 @@ const MonthSelector = ({ selectedMonth, onMonthChange }) => {
   const [startYear, setStartYear] = useState(2015);
   const [endYear, setEndYear] = useState(2035);
 
+  const dropdownRef = React.useRef(null);
+
   useEffect(() => {
     setDisplayMonth(new Date(selectedMonth));
     setSelectedYear(new Date(selectedMonth).getFullYear());
   }, [selectedMonth]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleOutsideClick = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen]);
 
   const monthNames = [
     "January",
@@ -100,7 +126,7 @@ const MonthSelector = ({ selectedMonth, onMonthChange }) => {
         </button>
 
         {/* Month Picker dropdown trigger */}
-        <div className="relative">
+        <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="flex items-center gap-1 sm:gap-2 px-2.5 sm:px-4 py-1.5 bg-purple-50 hover:bg-purple-100 dark:bg-purple-900/20 dark:hover:bg-purple-900/40 border border-purple-200/50 dark:border-purple-800/30 rounded-lg hover:shadow-sm transition-all duration-200 whitespace-nowrap text-purple-700 dark:text-purple-400 font-semibold text-xs sm:text-sm"
@@ -117,7 +143,7 @@ const MonthSelector = ({ selectedMonth, onMonthChange }) => {
 
           {/* Month & Year Picker Dropdown */}
           {isOpen && (
-            <div className="absolute top-full left-0 mt-2 w-80 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-50 p-5 transition-all animate-in fade-in slide-in-from-top-2 duration-200">
+            <div className="absolute top-full left-0 mt-2 w-[calc(100vw-2.5rem)] max-w-xs sm:w-80 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-50 p-5 transition-all animate-in fade-in slide-in-from-top-2 duration-200">
               {/* Year Selection */}
               <div className="mb-4">
                 <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">

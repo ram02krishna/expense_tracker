@@ -33,8 +33,12 @@ axiosInstance.interceptors.response.use(
   },
   (error) => {
     if (error.response) {
-      if (error.response.status === 401) {
-        // go back to login
+      if (
+        error.response.status === 401 &&
+        !error.config?.url?.includes("/auth/login") &&
+        window.location.pathname !== "/login"
+      ) {
+        localStorage.removeItem("token");
         window.location.href = "/login";
       } else if (error.response.status === 500) {
         console.error("Server error. Please try again later.");

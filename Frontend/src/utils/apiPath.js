@@ -1,4 +1,4 @@
-export let BASE_URL = import.meta.env.VITE_BASE_URL;
+export let BASE_URL = import.meta.env.VITE_BASE_URL || "http://localhost:5000";
 // my api paths
 export let API_PATHS = {
   AUTH: {

@@ -4,12 +4,33 @@ import { LuIndianRupee, LuTag, LuFileText } from "react-icons/lu";
 import EmojiPickerPopup from "../layouts/EmojiPickerPopup";
 import ModernDatePicker from "../Inputs/ModernDatePicker";
 
+const getTodayDateString = () => {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+};
+
+const formatDateForInput = (dateVal) => {
+  if (!dateVal) return getTodayDateString();
+  if (typeof dateVal === "string" && /^\d{4}-\d{2}-\d{2}$/.test(dateVal)) {
+    return dateVal;
+  }
+  const d = new Date(dateVal);
+  if (isNaN(d.getTime())) return getTodayDateString();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+};
+
 const AddExpenseForm = ({ onAddExpense, closeModal, editingData = null }) => {
   const [expense, setExpense] = useState({
     title: "",
     category: "",
     amount: "",
-    date: new Date().toISOString().split("T")[0],
+    date: getTodayDateString(),
     description: "",
     icon: "",
   });
@@ -23,9 +44,7 @@ const AddExpenseForm = ({ onAddExpense, closeModal, editingData = null }) => {
         title: editingData.title || "",
         category: editingData.category || "",
         amount: editingData.amount || "",
-        date: editingData.date
-          ? new Date(editingData.date).toISOString().split("T")[0]
-          : new Date().toISOString().split("T")[0],
+        date: formatDateForInput(editingData.date),
         description: editingData.description || "",
         icon: editingData.icon || "",
       });
@@ -34,7 +53,7 @@ const AddExpenseForm = ({ onAddExpense, closeModal, editingData = null }) => {
         title: "",
         category: "",
         amount: "",
-        date: new Date().toISOString().split("T")[0],
+        date: getTodayDateString(),
         description: "",
         icon: "",
       });
@@ -72,7 +91,7 @@ const AddExpenseForm = ({ onAddExpense, closeModal, editingData = null }) => {
           title: "",
           category: "",
           amount: "",
-          date: new Date().toISOString().split("T")[0],
+          date: getTodayDateString(),
           description: "",
           icon: "",
         });
@@ -91,7 +110,7 @@ const AddExpenseForm = ({ onAddExpense, closeModal, editingData = null }) => {
       title: "",
       category: "",
       amount: "",
-      date: new Date().toISOString().split("T")[0],
+      date: getTodayDateString(),
       description: "",
       icon: "",
     });
@@ -103,21 +122,8 @@ const AddExpenseForm = ({ onAddExpense, closeModal, editingData = null }) => {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="w-full max-w-2xl mx-auto"
-    >
-      <div
-        className="
-          bg-white dark:bg-gray-900 
-          text-gray-900 dark:text-gray-100 
-          border border-gray-200 dark:border-gray-700
-          p-6 rounded-2xl shadow-lg
-        "
-      >
-        <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="w-full">
+      <form onSubmit={handleSubmit} className="space-y-6">
           {/* TITLE + CATEGORY */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Expense Title */}
@@ -304,8 +310,7 @@ const AddExpenseForm = ({ onAddExpense, closeModal, editingData = null }) => {
             </button>
           </div>
         </form>
-      </div>
-    </motion.div>
+    </div>
   );
 };
 

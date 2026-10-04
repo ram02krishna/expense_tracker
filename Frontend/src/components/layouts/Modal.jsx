@@ -42,8 +42,8 @@ const Modal = ({ children, isOpen, onClose, title }) => {
             : "scale-95 opacity-0 translate-y-4"
         }`}
       >
-        <div className="relative bg-white dark:bg-gray-800 rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] border border-gray-100 dark:border-gray-700 overflow-hidden">
-          <div className="flex items-center justify-between px-8 py-6 border-b border-gray-100 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-800/50">
+        <div className="relative bg-white dark:bg-gray-800 rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] border border-gray-100 dark:border-gray-700">
+          <div className="flex items-center justify-between px-6 md:px-8 py-5 md:py-6 border-b border-gray-100 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-800/50 rounded-t-3xl">
             <h3 className="text-xl font-bold text-gray-900 dark:text-white">
               {title}
             </h3>
@@ -75,7 +75,7 @@ const Modal = ({ children, isOpen, onClose, title }) => {
             </button>
           </div>
 
-          <div className="p-8">{children}</div>
+          <div className="p-6 md:p-8">{children}</div>
         </div>
       </div>
     </div>,
