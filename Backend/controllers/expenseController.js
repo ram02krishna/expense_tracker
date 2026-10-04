@@ -78,13 +78,14 @@ exports.getAllExpenses = asyncHandler(async (req, res, next) => {
   let limitVal = parseInt(limit) || 10;
   let skipVal = (pageNo - 1) * limitVal;
 
-  let finalExpenses = await Expense.find(myQuery)
-    .sort({ date: -1 })
-    .skip(skipVal)
-    .limit(limitVal)
-    .lean();
-
-  let totalCount = await Expense.countDocuments(myQuery);
+  let [finalExpenses, totalCount] = await Promise.all([
+    Expense.find(myQuery)
+      .sort({ date: -1 })
+      .skip(skipVal)
+      .limit(limitVal)
+      .lean(),
+    Expense.countDocuments(myQuery),
+  ]);
 
   res.status(200).json({
     status: "success",

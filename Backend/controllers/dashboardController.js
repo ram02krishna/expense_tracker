@@ -139,20 +139,22 @@ exports.getMonthlyDashboardSummary = asyncHandler(async (req, res, next) => {
 
   let [incomeStats, expenseStats] = await Promise.all([
     Income.aggregate([
-      { $match: { user: new mongoose.Types.ObjectId(uId) } },
+      {
+        $match: {
+          user: new mongoose.Types.ObjectId(uId),
+          date: { $gte: startDate, $lte: endDate },
+        },
+      },
       {
         $facet: {
           monthlyIncomes: [
-            { $match: { date: { $gte: startDate, $lte: endDate } } },
             { $sort: { date: -1 } },
             { $addFields: { type: "income" } },
           ],
           totalIncome: [
-            { $match: { date: { $gte: startDate, $lte: endDate } } },
             { $group: { _id: null, total: { $sum: "$amount" } } },
           ],
           incomeBySource: [
-            { $match: { date: { $gte: startDate, $lte: endDate } } },
             { $group: { _id: "$source", totalAmount: { $sum: "$amount" } } },
             { $sort: { totalAmount: -1 } },
           ],
@@ -160,20 +162,22 @@ exports.getMonthlyDashboardSummary = asyncHandler(async (req, res, next) => {
       },
     ]),
     Expense.aggregate([
-      { $match: { user: new mongoose.Types.ObjectId(uId) } },
+      {
+        $match: {
+          user: new mongoose.Types.ObjectId(uId),
+          date: { $gte: startDate, $lte: endDate },
+        },
+      },
       {
         $facet: {
           monthlyExpenses: [
-            { $match: { date: { $gte: startDate, $lte: endDate } } },
             { $sort: { date: -1 } },
             { $addFields: { type: "expense" } },
           ],
           totalExpense: [
-            { $match: { date: { $gte: startDate, $lte: endDate } } },
             { $group: { _id: null, total: { $sum: "$amount" } } },
           ],
           expenseByCategory: [
-            { $match: { date: { $gte: startDate, $lte: endDate } } },
             { $group: { _id: "$category", totalAmount: { $sum: "$amount" } } },
             { $sort: { totalAmount: -1 } },
           ],

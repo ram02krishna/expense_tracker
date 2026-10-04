@@ -81,13 +81,14 @@ exports.getAllIncome = asyncHandler(async (req, res, next) => {
   let limitVal = parseInt(limit) || 10;
   let skipVal = (pageNo - 1) * limitVal;
 
-  let finalIncomes = await Income.find(myQuery)
-    .sort({ date: -1 })
-    .skip(skipVal)
-    .limit(limitVal)
-    .lean();
-
-  let totalCount = await Income.countDocuments(myQuery);
+  let [finalIncomes, totalCount] = await Promise.all([
+    Income.find(myQuery)
+      .sort({ date: -1 })
+      .skip(skipVal)
+      .limit(limitVal)
+      .lean(),
+    Income.countDocuments(myQuery),
+  ]);
 
   res.status(200).json({
     status: "success",

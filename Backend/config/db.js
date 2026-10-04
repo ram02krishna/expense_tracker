@@ -12,10 +12,15 @@ let connectDB = async () => {
     return;
   }
 
+  if (!process.env.MONGO_URI) {
+    console.error("MONGO_URI is missing from environment variables!");
+    throw new Error("MONGO_URI environment variable is missing.");
+  }
+
   try {
     let options = {
       bufferCommands: false,
-      serverSelectionTimeoutMS: 5000,
+      serverSelectionTimeoutMS: 8000,
       socketTimeoutMS: 45000,
       maxPoolSize: 10,
     };
@@ -25,9 +30,9 @@ let connectDB = async () => {
     await cachedPromise;
     console.log("MongoDB connected successfully.");
   } catch (error) {
-    console.error("MongoDB connection error:", error);
+    console.error("MongoDB connection error:", error.message || error);
     cachedPromise = null;
-    throw new Error("Database connection failed.");
+    throw new Error(`Database connection failed: ${error.message}`);
   }
 };
 

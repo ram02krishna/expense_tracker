@@ -4,8 +4,19 @@ import axiosInstance from "../utils/axiosInstance";
 import { API_PATHS } from "../utils/apiPath";
 
 let UserProvider = ({ children }) => {
-  let [user, setUser] = useState(null);
-  let [loading, setLoading] = useState(true);
+  let [user, setUser] = useState(() => {
+    try {
+      const savedUser = localStorage.getItem("user");
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch {
+      return null;
+    }
+  });
+  let [loading, setLoading] = useState(() => {
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const savedUser = typeof window !== "undefined" ? localStorage.getItem("user") : null;
+    return !!token && !savedUser;
+  });
   let [selectedMonth, setSelectedMonth] = useState(new Date());
 
   useEffect(() => {
@@ -13,6 +24,7 @@ let UserProvider = ({ children }) => {
       let token = localStorage.getItem("token");
       if (!token) {
         setLoading(false);
+        setUser(null);
         return;
       }
 
@@ -20,11 +32,14 @@ let UserProvider = ({ children }) => {
         let response = await axiosInstance.get(API_PATHS.AUTH.GET_USER_INFO);
         if (response?.data?.data?.user) {
           setUser(response.data.data.user);
+          localStorage.setItem("user", JSON.stringify(response.data.data.user));
         }
       } catch (error) {
         console.error("Error fetching user info:", error);
         // remove token if it's invalid
         localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -36,6 +51,11 @@ let UserProvider = ({ children }) => {
   // update the user state
   let updateUser = useCallback((userData) => {
     setUser(userData);
+    if (userData) {
+      localStorage.setItem("user", JSON.stringify(userData));
+    } else {
+      localStorage.removeItem("user");
+    }
   }, []);
 
   // remove the user data
@@ -43,6 +63,7 @@ let UserProvider = ({ children }) => {
     setUser(null);
     setSelectedMonth(new Date());
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
   }, []);
 
   return (

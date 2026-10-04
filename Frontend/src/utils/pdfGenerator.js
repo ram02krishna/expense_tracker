@@ -1,15 +1,20 @@
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import html2canvas from "html2canvas";
 import moment from "moment";
 
-// function to create a pdf
+// function to create a pdf with on-demand lazy loading of heavy PDF libraries
 export let generatePDF = async (
   title,
   transactions,
   chartIds = [],
   type = "income",
 ) => {
+  const [{ default: jsPDF }, autoTableModule, { default: html2canvas }] =
+    await Promise.all([
+      import("jspdf"),
+      import("jspdf-autotable"),
+      import("html2canvas"),
+    ]);
+
+  const autoTable = autoTableModule.default || autoTableModule;
   let doc = new jsPDF();
   let tableColumn = ["Date", "Description", "Category/Source", "Amount"];
   let tableRows = [];

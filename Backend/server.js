@@ -30,32 +30,38 @@ app.use(
 );
 
 // CORS setup
-let allowedOrigins = ["http://localhost:5173", "http://localhost:5174"];
+let defaultAllowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "https://expense-tracker-omega-wine.vercel.app",
+];
 if (process.env.CLIENT_URL) {
-  allowedOrigins = process.env.CLIENT_URL.split(",").map((url) => url.trim());
+  defaultAllowedOrigins.push(
+    ...process.env.CLIENT_URL.split(",").map((url) => url.trim()),
+  );
 }
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // allow if no origin
-      if (!origin) return callback(null, true);
+const corsOptions = {
+  origin: (origin, callback) => {
+    // allow if no origin (e.g. mobile apps, curl)
+    if (!origin) return callback(null, true);
 
-      if (
-        allowedOrigins.indexOf(origin) !== -1 ||
-        origin.endsWith(".vercel.app")
-      ) {
-        callback(null, true);
-      } else {
-        console.error(`CORS error: ${origin} not allowed`);
-        callback(null, false);
-      }
-    },
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-CSRF-Token"],
-    credentials: true,
-  }),
-);
+    if (
+      defaultAllowedOrigins.indexOf(origin) !== -1 ||
+      origin.endsWith(".vercel.app")
+    ) {
+      callback(null, true);
+    } else {
+      console.error(`CORS error: ${origin} not allowed`);
+      callback(null, false);
+    }
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-CSRF-Token", "Accept"],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 // server rate limiter
 const normalLimiter = rateLimit({
